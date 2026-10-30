@@ -23,8 +23,8 @@ class GenericPublisherImpl implements GenericPublisher {
 
     private final List<GenericProvider> genericPublishers;
     private final List<GenericFallbackPublisher> genericFallbackPublishers;
-    private ObjectMapper mapper;
-    private ApplicationProperties properties;
+    private final ObjectMapper mapper;
+    private final ApplicationProperties properties;
 
     @Override
     public void sendDataToIngest(final Object input) {
