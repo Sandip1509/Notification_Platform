@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: api
+
+  mongodb:
+    uri: mongodb://root:root@localhost:27017/admin
+    representation:
+      uuid: standard
+    database: notification-service
+
+  kafka:
+    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+    ingest:
+      topic: notification.ingest
+    audit:
+      topic: notification.audit
+
+messaging:
+  providers:
+    kafka:
+      enabled: true
+    aws:
+      enabled: false
+  fallback:
+    rabbitmq:
+      enabled: true
+    mqtt:
+      enabled: false

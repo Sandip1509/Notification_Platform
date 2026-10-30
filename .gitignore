@@ -1,0 +1,15 @@
+### IDE ###
+.idea/
+*.iml
+
+### Maven ###
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### Docker volumes (runtime data, not source) ###
+volumes/
+
+### OS ###
+.DS_Store
+Thumbs.db
