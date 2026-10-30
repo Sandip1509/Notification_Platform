@@ -29,7 +29,7 @@ public final class CommonUtils {
         return UUID.randomUUID().toString();
     }
 
-    public static String getCurrentTenantId() {
+    public static UUID getCurrentTenantId() {
         return NotificationContextHolder.getContext().tenantId();
     }
 

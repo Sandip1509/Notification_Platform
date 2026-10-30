@@ -3,7 +3,7 @@ spring:
     name: api
 
   mongodb:
-    uri: mongodb://root:root@localhost:27017/admin
+    uri: mongodb://root:root@localhost:27017/
     representation:
       uuid: standard
     database: notification-service

@@ -48,7 +48,7 @@ public class NotificationServiceImpl implements NotificationService {
         IngestTopicDTO ingestTopicDTO = new IngestTopicDTO();
 
         ingestTopicDTO.setRequestId(CommonUtils.getCurrentTraceId());
-        ingestTopicDTO.setTenantId(CommonUtils.getCurrentTenantId());
+        ingestTopicDTO.setTenantId(CommonUtils.getCurrentTenantId().toString());
         ingestTopicDTO.setReceivedAt(CommonUtils.getCurrentTimeStamp());
         ingestTopicDTO.setDynamicVariables(request.getDynamicVariables());
         ingestTopicDTO.setTemplateId(request.getTemplateId());

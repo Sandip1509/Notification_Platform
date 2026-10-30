@@ -6,13 +6,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public interface TemplateDao {
 
-    Optional<Template> findByTenantIdAndName(String tenantId, String templateName);
+    Optional<Template> findByTenantIdAndName(UUID tenantId, String templateName);
 
-    Optional<Template> findByTenantIdAndId(String tenantId, String id);
+    Optional<Template> findByTenantIdAndId(UUID tenantId, String id);
 
     Template save(Template template);
 

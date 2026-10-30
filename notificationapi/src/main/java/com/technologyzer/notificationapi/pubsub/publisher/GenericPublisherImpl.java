@@ -1,7 +1,7 @@
 package com.technologyzer.notificationapi.pubsub.publisher;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.technologyzer.notificationapi.config.ApplicationProperties;
 import com.technologyzer.notificationapi.exception.ValidationException;
 import com.technologyzer.notificationapi.pubsub.fallback.GenericFallbackPublisher;
@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -74,7 +76,7 @@ class GenericPublisherImpl implements GenericPublisher {
     private String convertDataIntoString(final Object input) {
         try {
             return mapper.writeValueAsString(input);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new ValidationException("Error while parsing input payload",
                     HttpStatus.INTERNAL_SERVER_ERROR.value());
         }

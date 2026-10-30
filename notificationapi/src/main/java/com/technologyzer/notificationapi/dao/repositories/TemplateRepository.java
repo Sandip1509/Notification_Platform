@@ -10,7 +10,7 @@ import java.util.UUID;
 @Repository
 public interface TemplateRepository extends MongoRepository<Template, UUID> {
 
-    Optional<Template> findByNameIgnoreCaseAndTenantId(String name, String tenantId);
+    Optional<Template> findByNameIgnoreCaseAndTenantId(String name, UUID tenantId);
 
-    Optional<Template> findByIdAndTenantId(String id, String tenantId);
+    Optional<Template> findByIdAndTenantId(UUID id, UUID tenantId);
 }

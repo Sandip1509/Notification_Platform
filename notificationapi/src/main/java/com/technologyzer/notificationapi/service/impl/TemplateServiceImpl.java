@@ -36,13 +36,13 @@ class TemplateServiceImpl implements TemplateService {
     public TemplateResponse createTemplate(final CreateTemplateRequest request) {
 //        NotificationContext context = NotificationContextHolder.getContext();
 
-        templateDao.findByTenantIdAndName(getCurrentTenantId().toString(), request.getName()).ifPresent(template -> {
+        templateDao.findByTenantIdAndName(getCurrentTenantId(), request.getName()).ifPresent(template -> {
             throw new ValidationException(TEMPLATE_ALREADY_EXISTS_ERROR, HttpStatus.BAD_REQUEST.value());
         });
 
         Template template = new Template();
         template.setId(UUID.fromString(generateUUID()));
-        template.setTenantId(UUID.fromString(getCurrentTenantId()));
+        template.setTenantId(getCurrentTenantId());
         BeanUtils.copyProperties(request, template);
         template.entityCreated();
         templateDao.save(template);
@@ -61,7 +61,7 @@ class TemplateServiceImpl implements TemplateService {
     public TemplateResponse updateTemplate(String id, UpdateTemplateRequest request) {
         Template template = getTemplateForCurrentTenant(id);
         if (isNotEmpty(request.getName())) {
-            templateDao.findByTenantIdAndName(getCurrentTenantId().toString(), request.getName()).ifPresent(t -> {
+            templateDao.findByTenantIdAndName(getCurrentTenantId(), request.getName()).ifPresent(t -> {
                 throw new ValidationException(TEMPLATE_ALREADY_EXISTS_ERROR, HttpStatus.BAD_REQUEST.value());
             });
             template.setName(request.getName());
@@ -83,7 +83,7 @@ class TemplateServiceImpl implements TemplateService {
     }
 
     private Template getTemplateForCurrentTenant(final String id) {
-        return templateDao.findByTenantIdAndId(getCurrentTenantId().toString(), id)
+        return templateDao.findByTenantIdAndId(getCurrentTenantId(), id)
                 .orElseThrow(() -> new ValidationException(TEMPLATE_NOT_EXISTS_WITH_ID_ERROR,
                         HttpStatus.BAD_REQUEST.value()));
     }

@@ -1,12 +1,15 @@
 package com.technologyzer.notificationapi.dao.impl;
 
 
-import com.technologyzer.notificationapi.dao.interfaces.CacheService;
 import com.technologyzer.notificationapi.dao.interfaces.TemplateDao;
 import com.technologyzer.notificationapi.dao.repositories.TemplateRepository;
 import com.technologyzer.notificationapi.models.entity.Template;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,32 +28,26 @@ import static com.technologyzer.notificationapi.utils.CommonUtils.isNotEmpty;
 class TemplateDaoImpl implements TemplateDao {
 
     private final TemplateRepository templateRepository;
-    private final CacheService cacheService;
+    private final CacheManager cacheManager;
 
     @Override
-    public Optional<Template> findByTenantIdAndName(final String tenantId, final String templateName) {
-        return cacheService.getByName(tenantId, templateName, Template.class)
-                .or(() -> templateRepository.findByNameIgnoreCaseAndTenantId(templateName, tenantId)
-                        .map(template -> {
-                            cacheService.putByName(tenantId, templateName, template);
-                            return template;
-                        }));
+    @Cacheable(cacheNames = "templatesByName", key="#tenantId + ':' + #templateName", unless = "#result == null")
+    public Optional<Template> findByTenantIdAndName(final UUID tenantId, final String templateName) {
+        return templateRepository.findByNameIgnoreCaseAndTenantId(templateName, tenantId);
     }
 
     @Override
-    public Optional<Template> findByTenantIdAndId(final String tenantId, final String id) {
-        return cacheService.getById(tenantId, id, Template.class).or(() -> {
-            return templateRepository.findByIdAndTenantId(id, tenantId).map(template -> {
-                cacheService.putById(tenantId, id, template);
-                return template;
-            });
-        });
+    @Cacheable(cacheNames = "templatesById", key = "#tenantId + ':' + #id", unless = "#result == null")
+    public Optional<Template> findByTenantIdAndId(final UUID tenantId, final String id) {
+        return templateRepository.findByIdAndTenantId(UUID.fromString(id), tenantId);
     }
 
     @Override
+    @Caching(put = {
+            @CachePut(cacheNames = "templatesById", key = "#template.tenantId + ':' + #template.id"),
+            @CachePut(cacheNames = "templatesByName", key = "#template.tenantId + ':' + #template.name")
+    })
     public Template save(final Template template) {
-        cacheService.putById(template.getTenantId().toString(), template.getId().toString(), template);
-        cacheService.putByName(template.getTenantId().toString(), template.getName(), template);
         return templateRepository.save(template);
     }
 
@@ -62,9 +59,9 @@ class TemplateDaoImpl implements TemplateDao {
 
     @Override
     public void deleteTemplateById(final String id, final Supplier<? extends Throwable> exceptionHandler) {
-        findByTenantIdAndId(getCurrentTenantId(), id).ifPresentOrElse(template -> {
-            cacheService.deleteById(template.getTenantId().toString(), template.getId().toString());
-            cacheService.deleteByName(template.getTenantId().toString(), template.getName());
+        templateRepository.findByIdAndTenantId(UUID.fromString(id), getCurrentTenantId()).ifPresentOrElse(template -> {
+            cacheManager.getCache("templatesById").evict(template.getTenantId() + ":" + template.getId());
+            cacheManager.getCache("templatesByName").evict(template.getTenantId() + ":" + template.getName());
             templateRepository.deleteById(UUID.fromString(id));
         }, () -> {
             if (isNotEmpty(exceptionHandler)) {

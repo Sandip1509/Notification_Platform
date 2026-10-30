@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 
 import java.lang.reflect.Field;
+import java.util.UUID;
 
 import static com.technologyzer.notificationapi.utils.CommonUtils.getCurrentTenantId;
 import static com.technologyzer.notificationapi.utils.CommonUtils.isNotEmpty;
